@@ -16,8 +16,6 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-	"errors"
-	"gopkg.in/fatih/pool.v2"
 )
 
 const (
@@ -159,6 +157,29 @@ func DialTLS(url string, amqps *tls.Config) (*Connection, error) {
 	})
 }
 
+// dail with given conn
+func DialWithConn(conn net.Conn, url string) (*Connection, error) {
+	uri, err := ParseURI(url)
+	if err != nil {
+		return nil, err
+	}
+
+	config := Config{
+		Heartbeat: defaultHeartbeat,
+		Locale:    defaultLocale,
+	}
+
+	if config.SASL == nil {
+		config.SASL = []Authentication{uri.PlainAuth()}
+	}
+
+	if config.Vhost == "" {
+		config.Vhost = uri.Vhost
+	}
+
+	return Open(conn, config)
+}
+
 // DialConfig accepts a string in the AMQP URI format and a configuration for
 // the transport and connection setup, returning a new Connection.  Defaults to
 // a server heartbeat interval of 10 seconds and sets the initial read deadline
@@ -187,24 +208,7 @@ func DialConfig(url string, config Config) (*Connection, error) {
 		dialer = defaultDial
 	}
 
-	initialCap := config.InitialCap
-	maxCap := config.MaxCap
-	if 0 != initialCap && 0 != maxCap {
-		if initialCap < 0 || maxCap <= 0 || initialCap > maxCap {
-			return nil, errors.New("invalid capacity settings")
-		}
-		factory := func() (net.Conn, error) {
-			return dialer("tcp", addr)
-		}
-		p, err := pool.NewChannelPool(initialCap, maxCap, factory)
-		if err != nil {
-			return nil, err
-		}
-		conn, err = p.Get()
-	} else {
-		conn, err = dialer("tcp", addr)
-	}
-
+	conn, err = dialer("tcp", addr)
 	if err != nil {
 		return nil, err
 	}
