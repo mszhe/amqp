@@ -109,6 +109,8 @@ type Connection struct {
 	Locales    []string // Server locales
 
 	closed int32 // Will be 1 if the connection is closed, 0 otherwise. Should only be accessed as atomic
+
+	Pool *pool.Pool
 }
 
 type readDeadliner interface {
