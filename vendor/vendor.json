@@ -7,6 +7,12 @@
 			"path": "github.com/streadway/amqp",
 			"revision": "ff791c2d22d3f1588b4e2cc71a9fba5e1da90654",
 			"revisionTime": "2017-11-01T22:23:33Z"
+		},
+		{
+			"checksumSHA1": "P8yR+xObqoPUA4fcLFV2eGNNSWc=",
+			"path": "gopkg.in/fatih/pool.v2",
+			"revision": "010e0b745d12eaf8426c95f9c3924d81dd0b668f",
+			"revisionTime": "2017-10-10T08:14:17Z"
 		}
 	],
 	"rootPath": "github.com/mszhe/amqp"
