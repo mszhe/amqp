@@ -12,16 +12,13 @@ func GetPool(url string, initialCap, maxCap int) (pool.Pool, error) {
 	if err != nil {
 		return nil, err
 	}
-	addr := net.JoinHostPort(uri.Host, strconv.FormatInt(int64(uri.Port), 10))
-	dialer := defaultDial
 	if 0 != initialCap && 0 != maxCap {
 		if initialCap < 0 || maxCap <= 0 || initialCap > maxCap {
 			return nil, errors.New("invalid capacity settings")
 		}
-		factory := func() (net.Conn, error) {
-			return dialer("tcp", addr)
-		}
-		return pool.NewChannelPool(initialCap, maxCap, factory)
+		return pool.NewChannelPool(initialCap, maxCap, func() (net.Conn, error) {
+			return defaultDial("tcp", net.JoinHostPort(uri.Host, strconv.FormatInt(int64(uri.Port), 10)))
+		})
 	} else {
 		return nil, errors.New("invalid capacity settings")
 	}
