@@ -16,6 +16,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"errors"
+	"gopkg.in/fatih/pool.v2"
 )
 
 const (
@@ -67,6 +69,10 @@ type Config struct {
 	// If Dial is nil, net.DialTimeout with a 30s connection and 30s deadline is
 	// used during TLS and AMQP handshaking.
 	Dial func(network, addr string) (net.Conn, error)
+
+	// pool
+	InitialCap int
+	MaxCap     int
 }
 
 // Connection manages the serialization and deserialization of frames from IO
@@ -181,7 +187,24 @@ func DialConfig(url string, config Config) (*Connection, error) {
 		dialer = defaultDial
 	}
 
-	conn, err = dialer("tcp", addr)
+	initialCap := config.InitialCap
+	maxCap := config.MaxCap
+	if 0 != initialCap && 0 != maxCap {
+		if initialCap < 0 || maxCap <= 0 || initialCap > maxCap {
+			return nil, errors.New("invalid capacity settings")
+		}
+		factory := func() (net.Conn, error) {
+			return dialer("tcp", addr)
+		}
+		p, err := pool.NewChannelPool(initialCap, maxCap, factory)
+		if err != nil {
+			return nil, err
+		}
+		conn, err = p.Get()
+	} else {
+		conn, err = dialer("tcp", addr)
+	}
+
 	if err != nil {
 		return nil, err
 	}
