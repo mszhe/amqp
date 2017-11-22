@@ -67,10 +67,6 @@ type Config struct {
 	// If Dial is nil, net.DialTimeout with a 30s connection and 30s deadline is
 	// used during TLS and AMQP handshaking.
 	Dial func(network, addr string) (net.Conn, error)
-
-	// pool
-	InitialCap int
-	MaxCap     int
 }
 
 // Connection manages the serialization and deserialization of frames from IO
