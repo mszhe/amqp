@@ -22,6 +22,7 @@ func GetPool(url string, initialCap, maxCap int) (pool.Pool, error) {
 			return dialer("tcp", addr)
 		}
 		return pool.NewChannelPool(initialCap, maxCap, factory)
+	} else {
+		return nil, errors.New("invalid capacity settings")
 	}
-	return nil, nil
 }
