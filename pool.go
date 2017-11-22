@@ -1,16 +1,11 @@
 package amqp
 
 import (
+	"errors"
+	"gopkg.in/fatih/pool.v2"
 	"net"
 	"strconv"
-	"gopkg.in/fatih/pool.v2"
-	"errors"
 )
-
-type ConfigConn struct {
-	Config *Config
-	Conn   net.Conn
-}
 
 func GetPool(url string, initialCap, maxCap int) (pool.Pool, error) {
 	uri, err := ParseURI(url)
