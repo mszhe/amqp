@@ -6,23 +6,25 @@ import (
 )
 
 func TestGetPool(t *testing.T) {
-	url := "amqp://root:123456@localhost:5672/"
+	initCap := 5
+	maxCap := 10
+	url := "amqp://root:123456@192.168.1.254:5672/"
 
-	pool, err := GetPool(url, 5, 10)
+	pool, err := GetPool(url, initCap, maxCap)
 	if err != nil {
 		panic(err)
 	}
 
-	conn, err := pool.Get()
+	c, err := pool.Get()
 	if err != nil {
 		panic(err)
 	}
 
-	connection, err := DialWithConn(conn, url)
+	conn, err := DialWithConn(c, url)
 	if err != nil {
 		panic(err)
 	}
-	defer connection.Close()
+	defer conn.Close()
 
-	fmt.Println(connection)
+	fmt.Println(conn)
 }
