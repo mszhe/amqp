@@ -3,6 +3,7 @@ package amqp
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestGetPool(t *testing.T) {
@@ -27,4 +28,5 @@ func TestGetPool(t *testing.T) {
 	defer conn.Close()
 
 	fmt.Println(conn)
+	time.Sleep(time.Second*999999)
 }
